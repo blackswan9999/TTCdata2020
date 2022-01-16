@@ -1,7 +1,9 @@
 ---
 title: "An Analysis of Toronto Transit Commission (TTC) Bus Delay Data 2020"
-author: "Alice Huang, email: alicew.huang@mail.utoronto.ca"
-output: html_notebook
+author: 'Alice Huang, email: alice9999@protonmail.com'
+output:
+  html_document:
+    df_print: paged
 ---
 
 # Importance of TTC Bus Service in Toronto
