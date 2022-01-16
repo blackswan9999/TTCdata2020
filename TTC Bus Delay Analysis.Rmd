@@ -38,10 +38,9 @@ The 2020 TTC bus delay data on which this report was based was downloaded from t
 
 # Cleaning the Data
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 # Downloading the Data
 library(opendatatoronto)
-library(dplyr)
 library(tidyverse)
 
 ttc_bus_delays_2020 <- search_packages("TTC Bus Delay Data") %>%
@@ -103,18 +102,17 @@ ttc_bus_delays_2020_all <- bind_rows(jan2020_bus_delays,
 For some months, the delay time in minutes was entered in a column called `Delay`, while in other months, it was entered in a column called `Min Delay`. I assumed that both columns contained the delay time in minutes though the readme file only had instructions for `Min Delay` column. I made a new column called `Delay_Time` that combined the data from the two columns, and removed the `Delay` and `Min Delay` columns. Unfortunately, some Delay Times were entered as 0. Since it didn't make sense to have a delay with delay time 0, those instances were filtered out.
 
 ```{r}
+# Combining the two minute delay columns
 ttc_bus_delays_2020_all <- ttc_bus_delays_2020_all %>% 
   mutate(Delay_Time = ifelse(is.na(Delay), `Min Delay`, Delay)) %>%
   select(-Delay) %>%
   select(-`Min Delay`)
 
+# keeping only nonzero delay times
 ttc_bus_delays_2020_all %>% filter(Delay_Time >0) -> ttc_bus_delays_2020_all
 ```
 
-<<<<<<< HEAD
 There were MANY inconsistencies in the spellings and capitalizations of the recorded locations of the buses. For example, Scarborough Centre Station was entered as "SCARBOROUGH CENTRE STA", "Scarborough Town Centre", "Scarborough Centre STN", "Scarborough Town Center", just to name a few. All Locations will be changed to all caps to ensure consistency in capitalization. They will also follow the same spelling on the TTC website (https://ttc.ca/routes-and-schedules#/). Analysis on Locations of Delays is a work in progress, and many locations that are not subway stations are still entered inconsistently and/or spelled incorrectly. I hope to continue further processing the data so that the location names can be as consistent as possible. So far I have merged close to 1000 alternate spellings and capitalizations into the appropriate groups.
-
-There were MANY inconsistencies in the spellings and capitalizations of the recorded locations of the buses. For example, Scarborough Centre Station was entered as "SCARBOROUGH CENTRE STA", "Scarborough Town Centre", "Scarborough Centre STN", "Scarborough Town Center", just to name a few. All Locations will be changed to all caps to ensure consistency in capitalization. They will also follow the same spelling on the TTC website (https://ttc.ca/routes-and-schedules#/). Analysis on Locations of Delays is a work in progress, and many locations that are not subway stations are still entered inconsistently and/or spelled incorrectly. I hope to continue further processing the data so that the location names can be as consistent as possible. So far I have merged nearly 1000 Locations with alternate spellings and capitalizations into the appropriate groups.
 
 ## Ensuring Consistency of Spellings and Capitalizations
 
@@ -135,9 +133,7 @@ ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Locat
 
 # Remove all periods
 ttc_bus_delays_2020_all$Location = str_remove_all(ttc_bus_delays_2020_all$Location, "\\.")
-```
 
-```{r}
 ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, " W | WESTT " , " WEST ")
 ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, " E " , " EAST ")
 ```
@@ -256,6 +252,8 @@ ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Locat
 
 ```{r}
 # Fixing misspellings of York Mills Station
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location,  "YORKMILLS", "YORK MILLS")
+
 ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="YORKMILLS STATION"|
                                       ttc_bus_delays_2020_all["Location"] =="YORK MILLS STATION - J"|
                                       ttc_bus_delays_2020_all["Location"] =="YONGE AND YORK MILLS STATION"|
