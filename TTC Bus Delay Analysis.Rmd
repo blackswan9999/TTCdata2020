@@ -470,14 +470,16 @@ ttc_bus_delays_2020_all %>% group_by(Location) %>%
   arrange(desc(`Number of Delays`))
 ```
 
+## Factors Influencing Delays at Subway Stations
+So far, it seems that subway stations are the locations with the most delays. It would be interesting to gather additional data about these subway stations, and see why certain subway stations have more delays than others. Candidates to study include number of bus or streetcar routes connecting to the station, line number of subway, number of visitors per hour, and so on. 
+
 ## When Do Most Delays Happen?
-It'd be interesting to see what times, days and seasons experience the most delays. It would be interesting to download weather data and match it to the incidents by date and time. Then it may be possible to see if low temperatures and precipitation may be correlated with more mechanical repairs, collisions or diversions.
+It'd be interesting to see what times, days and seasons experience the most delays. It would be interesting to download weather data and match it to the incidents by date and time. Then it may be interesting to see if low temperatures and/or high precipitation may be correlated with more mechanical repairs, collisions or diversions.
 
 ## Subway and Streetcar Delays
 The TTC bus network is connected to its subway network and its streetcar network. It would be interesting to see if delays in the subway may affect delays in buses (eg due to increased passenger load) and vice versa. The TTC also posts datasets for Subway Delay Times and Streetcar Delay Times, so those would be interesting to explore.
 
 ## Impact of COVID-19 Service Cuts
-
 I would like to run similar code on the data for other years and see if some of the results are just specific to the 2020 data. Due to the COVID-19 pandemic, the TTC had to cut service to many bus lines, in part due to decreased ridership during lockdowns. Many TTC employees working roles that involved facing the public were at high risk of contracting the COVID-19 virus. It is possible that many employees had to self-isolate during 2020, thus reducing the number of people available to drive buses and do repairs.
 
 I wonder how such service changes may have affected the delay times of the buses. For example, would you expect more delays during a pandemic when there is less service, or would you expect more delays during non-pandemic times when there is more traffic? If I could find enough reliable information about TTC service in the TTC website's News archives, I'd like to make another column containing information about frequency of bus service (eg how many minutes between arrival of consecutive buses). The TTC has also posted Next Vehicle Arrival Time datasets so that may be promising to explore.
