@@ -127,6 +127,8 @@ ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Locat
 # Consistency between "&" and "AND"
 and_misspellings = " & | / | @ | AT "
 ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, and_misspellings , " AND ")
+# some locations were entered with '/' without any spaces around them
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "/" , " AND ")
 
 # Remove all periods
 ttc_bus_delays_2020_all$Location = str_remove_all(ttc_bus_delays_2020_all$Location, "\\.")
