@@ -1,0 +1,196 @@
+﻿Route,Name,Service_Type,Route_Direction
+7,Bathurst,Regular,North/South
+8,Broadview,Regular,North/South
+9,Bellamy,Regular,North/South
+10,Van Horne,Limited,East/West
+11,Bayview,Regular,North/South
+12,Kingston Road,Regular,East/West
+13,Avenue Road,Regular,North/South
+14,Glencairn,Regular,East/West
+15,Evans,Regular,East/West
+16,McCowan,Regular,North/South
+17,Birchmount,Regular,North/South
+19,Bay,Regular,North/South
+20,Cliffside,Regular,East/West
+21,Brimley,Regular,North/South
+22,Coxwell,Regular,North/South
+23,Dawes,Regular,North/South
+24,Victoria Park,Regular,North/South
+25,Don Mills,Regular,North/South
+26,Dupont,Regular,East/West
+28,Bayview South,Regular,East/West
+29,Dufferin,Regular,North/South
+30,High Park,Regular,East/West
+31,Greenwood,Regular,North/South
+32,Eglinton West,Regular,East/West
+33,Forest Hill,Regular,East/West
+34,Eglinton East,Regular,East/West
+35,Jane,Regular,North/South
+36,Finch West,Regular,North/South
+37,Islington,Regular,North/South
+38,Highland Creek,Regular,East/West
+39,Finch East,Regular,East/West
+40,Junction–Dundas West,Regular,East/West
+41,Keele,Regular,North/South
+42,Cummer,Regular,East/West
+43,Kennedy,Regular,North/South
+44,Kipling South,Regular,North/South
+45,Kipling,Regular,North/South
+46,Martin Grove,Regular,North/South
+47,Lansdowne,Regular,North/South
+48,Rathburn,Regular,East/West
+49,Bloor West,Regular,East/West
+50,Burnhamthorpe,Regular,East/West
+51,Leslie,Regular,North/South
+52,Lawrence West,Regular,East/West
+53,Steeles East,Regular,East/West
+54,Lawrence East,Regular,East/West
+55,Warren Park,Regular,North/South
+56,Leaside,Regular,North/South
+57,Midland,Regular,North/South
+59,Maple Leaf,Regular,East/West
+60,Steeles West,Regular,East/West
+61,Avenue Road North,Regular,North/South
+62,Mortimer,Regular,East/West
+63,Ossington,Regular,North/South
+64,Main,Regular,North/South
+65,Parliament,Regular,North/South
+66,Prince Edward,Regular,North/South
+67,Pharmacy,Regular,North/South
+68,Warden,Regular,North/South
+69,Warden South,Regular,North/South
+70,O'Connor,Regular,North/South
+71,Runnymede,Regular,North/South
+72,Pape,Regular,North/South
+73,Royal York,Regular,North/South
+74,Mt Pleasant,Regular,North/South
+75,Sherbourne,Regular,North/South
+76,Royal York South,Regular,North/South
+77,Swansea,Regular,North/South
+78,St. Andrews,Regular,East/West
+79,Scarlett Rd,Regular,North/South
+80,Queensway,Regular,East/West
+81,Thorncliffe Park,Regular,North/South
+82,Rosedale,Regular,East/West
+83,Jones,Regular,North/South
+84,Sheppard West,Regular,East/West
+85,Sheppard East,Regular,East/West
+86,Scarborough,Regular,East/West
+87,Cosburn,Regular,East/West
+88,South Leaside,Regular,East/West
+89,Weston,Regular,North/South
+90,Vaughan,Regular,North/South
+91,Woodbine,Regular,North/South
+92,Woodbine South,Regular,North/South
+93,Parkview Hills,Regular,North/South
+94,Wellesley,Regular,East/West
+95,York Mills,Regular,East/West
+96,Wilson,Regular,East/West
+97,Yonge,Regular,North/South
+98,Willowdale–Senlac,Regular,East/West
+99,Arrow Road,Limited,North/South
+100,Flemingdon Park,Regular,North/South
+101,Downsview Park,Regular,East/West
+102,Markham Rd,Regular,North/South
+103,Mt Pleasant North,Regular,North/South
+104,Faywood,Regular,North/South
+105,Dufferin North,Regular,North/South
+106,Sentinel,Regular,East/West
+107,York University Heights,Regular,North/South
+108,Driftwood,Regular,East/West
+109,Ranee,Regular,North/South
+110,Islington South,Regular,North/South
+111,East Mall,Regular,North/South
+112,West Mall,Regular,North/South
+113,Danforth,Regular,East/West
+115,Silver Hills,Limited,North/South
+116,Morningside,Regular,East/West
+118,Thistle Down,Regular,East/West
+119,Torbarrie,Limited,East/West
+120,Calvington,Regular,North/South
+121,Esplanade–River,Regular,East/West
+122,Graydon Hall,Regular,East/West
+123,Sherway,Regular,North/South
+124,Sunnybrook,Regular,North/South
+125,Drewry,Regular,East/West
+126,Christie,Regular,North/South
+127,Davenport,Regular,East/West
+129,McCowan North,Regular,North/South
+130,Middlefield,Regular,North/South
+131,Nugget,Regular,East/West
+132,Milner,Regular,East/West
+133,Neilson,Regular,North/South
+134,Progress,Regular,North/South
+135,Gerrard,Regular,East/West
+160,Bathurst North,Limited,North/South
+161,Rogers Rd,Regular,East/West
+162,Lawrence–Donway,Regular,East/West
+165,Weston Rd North,Regular,East/West
+167,Pharmacy North,Limited,North/South
+168,Symington,Regular,North/South
+169,Huntingwood,Limited,East/West
+171,Mt Dennis,Regular,North/South
+175,Bluffer's Park,Regular,North/South
+176,Mimico GO,Regular,East/West
+189,Stockyards,Regular,East/West
+300,Bloor–Danforth Night Bus,Night,East/West
+302,Kingston Road–McCowan Night Bus,Night,North/South
+307,Bathurst Night Bus,Night,North/South
+312,St. Clair–Junction Night Bus,Night,East/West
+315,Evans–Brown's Line Night Bus,Night,East/West
+320,Yonge Night Bus,Night,North/South
+322,Coxwell Night Bus,Night,East/West
+324,Victoria Park Night Bus,Night,North/South
+325,Don Mills Night Bus,Night,North/South
+329,Dufferin Night Bus,Night,North/South
+332,Eglinton West Night Bus,Night,East/West
+334,Eglinton East Night Bus,Night,East/West
+335,Jane Night Bus,Night,North/South
+336,Finch West Night Bus,Night,East/West
+337,Islington Night Bus,Night,North/South
+339,Finch East Night Bus,Night,East/West
+341,Keele Night Bus,Night,North/South
+343,Kennedy Night Bus,Night,North/South
+352,Lawrence West Night Bus,Night,East/West
+353,Steeles Night Bus,Night,East/West
+354,Lawrence East Night Bus,Night,East/West
+363,Ossington Night Bus,Night,North/South
+365,Parliament Night Bus,Night,North/South
+384,Sheppard West Night Bus,Night,East/West
+385,Sheppard East Night Bus,Night,East/West
+395,York Mills Night Bus,Night,East/West
+396,Wilson Night Bus,Night,East/West
+400,Lawrence Manor,Community,East/West
+402,Parkdale,Community,North/South
+403,South Don Mills,Community,North/South
+404,East York,Community,East/West
+405,Etobicoke,Community,East/West
+407,Toronto Rehab Cardiac Centre Community Link,Community,East/West
+900,Airport Express,Express,North/South
+902,Markham Rd Express,Express,North/South
+903,Kennedy–Scarborough Centre Express,Express,North/South
+905,Eglinton East Express,Express,East/West
+913,Progress Express,Express,North/South
+924,Victoria Park Express,Express,North/South
+925,Don Mills Express,Express,North/South
+927,Highway 27 Express,Express,North/South
+929,Dufferin Express,Express,North/South
+935,Jane Express,Express,North/South
+937,Islington Express,Express,North/South
+938,Highland Creek Express,Express,East/West
+939,Finch Express,Express,East/West
+941,Keele Express,Express,North/South
+943,Kennedy Express,Express,North/South
+944,Kipling South Express,Express,North/South
+945,Kipling Express,Express,North/South
+952,Lawrence West Express,Express,East/West
+953,Steeles East Express,Express,East/West
+954,Lawrence East Express,Express,East/West
+960,Steeles West Express,Express,East/West
+968,Warden Express,Express,North/South
+984,Sheppard West Express,Express,East/West
+985,Sheppard East Express,Express,East/West
+986,Scarborough Express,Express,East/West
+989,Weston Express,Express,North/South
+995,York Mills Express,Express,East/West
+996,Wilson Express,Express,East/West

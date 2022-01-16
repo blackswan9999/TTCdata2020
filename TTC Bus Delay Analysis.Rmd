@@ -1,0 +1,473 @@
+---
+title: "An Analysis of Toronto Transit Commission (TTC) Bus Delay Data 2020"
+author: "Alice Huang, email: alicew.huang@mail.utoronto.ca"
+output: html_notebook
+---
+
+# Importance of TTC Bus Service in Toronto
+
+The TTC (Toronto Transit Commission) has served the citizens of Toronto for over 100 years, and to date, has transported more than 31 billion riders to school, work, shopping, entertainment, and more destinations. Millions of people rely on the TTC to travel around Toronto.
+
+Public transit provides many benefits to citizens of metropolitan cities. For example:
+
+1. Public transit is more efficient at transporting large numbers of people at once and can reduce traffic congestion on busy roads.
+
+2. Public transit is more environmentally friendly than driving, as passengers can share the carbon footprint of vehicle emissions, and emit less pollution per capita.
+  * Fun Fact: In 2020, the TTC had the largest fleet of electric buses in North America
+
+3. Public transit is cheaper for riders. Riders and governments share the costs of vehicle maintenance, insurance, and fuel. Public transit is especially useful for low-income riders and allows them to access more opportunities for education, employment, and social mobility.
+
+Toronto is considered to have one of the best public transit systems in North America. This may surprise riders who lament the lack of subway coverage in comparison to Paris or Tokyo. However, this designation is due to the extensive network of buses which provide frequent service and cover many parts of the city. Many Torontonians' homes are less than a 15 minute walk away from a bus stop, subway station or streetcar. Many streets have buses that come in 10 minutes or less during rush hour. For riders who do not live downtown or do not travel downtown, the bus is the backbone of public transit. Buses are a key component of public transit in Toronto.
+
+Given the importance of efficient public transit in Toronto, it is important to learn about the frequency and length of bus delays in order to guarantee smoothness of operations and better rider experience in the future.
+
+# Objectives
+
+In this report we will address the following questions:
+
+1. Which bus routes have the most delays?
+2. Does direction of travel affect the delay time of buses?
+3. What are the most common causes of TTC bus delays?
+4. On average, what bus delay time can a rider expect given a specific incident (eg. collision, emergency services)?
+
+# Source of Data
+
+The 2020 TTC bus delay data on which this report was based was downloaded from the City of Toronto Open Data Portal (https://open.toronto.ca/dataset/ttc-bus-delay-data/) in January 2022. This data was published by the Toronto Transit Commission and was last updated on October 21, 2021. The data is in a XLSX file with different sheets for different months of the year 2020.
+
+# Cleaning the Data
+
+```{r}
+# Downloading the Data
+library(opendatatoronto)
+library(dplyr)
+library(tidyverse)
+
+ttc_bus_delays_2020 <- search_packages("TTC Bus Delay Data") %>%
+  list_package_resources() %>%
+  filter(name == "ttc-bus-delay-data-2020") %>%
+  get_resource()
+```
+
+I noticed that for some months, the `Route` number of the bus was double format while in others, it was character format. So I made all the route numbers double format for consistency. For some months, the `Time` column, which denoted the time the delay started, was entered in character format while in others, it was entered as a `double (S3: POSIXct, POSIXt)` type in R. All times were converted to the `double (S3: POSIXct, POSIXt)` type for consistency.
+
+```{r}
+# Making sure all the data types in the columns are the same before binding all months' data into 1 big dataset
+jan2020_bus_delays <- ttc_bus_delays_2020[["Jan 2020"]] %>% as_tibble()
+feb2020_bus_delays <- ttc_bus_delays_2020[["Feb 2020"]] %>% as_tibble()
+march2020_bus_delays <- ttc_bus_delays_2020[["March 2020"]] %>% as_tibble()
+april2020_bus_delays <- ttc_bus_delays_2020[["April 2020"]] %>% as_tibble()
+may2020_bus_delays <- ttc_bus_delays_2020[["May 2020"]] %>% as_tibble()
+june2020_bus_delays <- ttc_bus_delays_2020[["June 2020"]] %>% as_tibble()
+july2020_bus_delays <- ttc_bus_delays_2020[["July 2020"]] %>% as_tibble()
+
+aug2020_bus_delays <- ttc_bus_delays_2020[["Aug 20"]] %>% as_tibble()
+aug2020_bus_delays$Route <- as.numeric(aug2020_bus_delays$Route)
+aug2020_bus_delays$Time <- strptime(aug2020_bus_delays$Time, format = "")
+
+sept2020_bus_delays <- ttc_bus_delays_2020[["Sept 20"]] %>% as_tibble()
+sept2020_bus_delays$Route <- as.numeric(sept2020_bus_delays$Route)
+sept2020_bus_delays$Time <- strptime(sept2020_bus_delays$Time, format = "")
+
+oct2020_bus_delays <- ttc_bus_delays_2020[["Oct 20"]] %>% as_tibble()
+oct2020_bus_delays$Route <- as.numeric(oct2020_bus_delays$Route)
+oct2020_bus_delays$Time <- strptime(oct2020_bus_delays$Time, format = "")
+
+nov2020_bus_delays <- ttc_bus_delays_2020[["Nov 20"]] %>% as_tibble()
+nov2020_bus_delays$Route <- as.numeric(nov2020_bus_delays$Route)
+nov2020_bus_delays$Time <- strptime(nov2020_bus_delays$Time, format = "")
+
+dec2020_bus_delays <- ttc_bus_delays_2020[["Dec 20"]] %>% as_tibble()
+dec2020_bus_delays$Route <- as.numeric(dec2020_bus_delays$Route)
+dec2020_bus_delays$Time <- strptime(dec2020_bus_delays$Time, format = "")
+```
+
+The data from the different Excel sheets for the different months were combined into 1 large sheet.
+
+```{r}
+ttc_bus_delays_2020_all <- bind_rows(jan2020_bus_delays, 
+                                     feb2020_bus_delays,
+                                     march2020_bus_delays,
+                                     april2020_bus_delays,
+                                     may2020_bus_delays,
+                                     june2020_bus_delays,
+                                     july2020_bus_delays,
+                                     aug2020_bus_delays,
+                                     sept2020_bus_delays,
+                                     oct2020_bus_delays,
+                                     nov2020_bus_delays,
+                                     dec2020_bus_delays)
+```
+
+For some months, the delay time in minutes was entered in a column called `Delay`, while in other months, it was entered in a column called `Min Delay`. I assumed that both columns contained the delay time in minutes though the readme file only had instructions for `Min Delay` column. I made a new column called `Delay_Time` that combined the data from the two columns, and removed the `Delay` and `Min Delay` columns. Unfortunately, some Delay Times were entered as 0. Since it didn't make sense to have a delay with delay time 0, those instances were filtered out.
+
+```{r}
+ttc_bus_delays_2020_all <- ttc_bus_delays_2020_all %>% 
+  mutate(Delay_Time = ifelse(is.na(Delay), `Min Delay`, Delay)) %>%
+  select(-Delay) %>%
+  select(-`Min Delay`)
+
+ttc_bus_delays_2020_all %>% filter(Delay_Time >0) -> ttc_bus_delays_2020_all
+```
+
+There were MANY inconsistencies in the spellings and capitalizations of the recorded locations of the buses. For example, Scarborough Centre Station was entered as "SCARBOROUGH CENTRE STA", "Scarborough Town Centre", "Scarborough Centre STN", "Scarborough Town Center", just to name a few. All Locations will be changed to all caps to ensure consistency in capitalization. They will also follow the same spelling on the TTC website (https://ttc.ca/routes-and-schedules#/). Analysis on Locations of Delays is a work in progress, and many locations that are not subway stations are still entered inconsistently and/or spelled incorrectly. I hope to continue further processing the data so that the location names can be as consistent as possible.
+
+## Ensuring Consistency of Spellings and Capitalizations
+
+```{r Fixing spellings in data}
+# Converting everything to all caps
+ttc_bus_delays_2020_all$Location = toupper(ttc_bus_delays_2020_all$Location) 
+
+# Correcting all misspellings of STATION
+station_misspellings = "STN|STATION|STATON|STTION|STATIION|STTAION|STATIOMN|STATA ION|STAITON|STATATION|STAION|STATIO|STTN|STATIONO"
+
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, station_misspellings, "STATION")
+
+# Consistency between "&" and "AND"
+and_misspellings = " & | / | @ | AT "
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, and_misspellings , " AND ")
+
+# Remove all periods
+ttc_bus_delays_2020_all$Location = str_remove_all(ttc_bus_delays_2020_all$Location, "\\.")
+```
+
+```{r}
+# Fixing misspellings of Eglinton Station
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "EGLINGTON" , "EGLINTON")
+
+
+ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="EGLINTON STATION (RAD VEHICLE)"|
+                                      ttc_bus_delays_2020_all["Location"] =="POD EGLINTON STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="EGLINTON STATION AND YONGE ST"|
+                                      ttc_bus_delays_2020_all["Location"] =="YONGE AND EGLINTON (EGLINTON STATION)"|
+                                      ttc_bus_delays_2020_all["Location"] =="EGLINTON STATION - DUPLEX"
+                                      ] <- "EGLINTON STATION"
+```
+
+```{r}
+# Fixing misspellings of Finch, Finch West Station
+ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="FINCH STATION EAST"| 
+                                      ttc_bus_delays_2020_all["Location"] =="FINCH STATION EXIT"|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Finch station south entrance traffic signal")] <- "FINCH STATION"
+
+ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] ==  "FINCH  WEST STATION"| 
+                                      ttc_bus_delays_2020_all["Location"] ==  "FINCH WEST STATION AND 0"] <- "FINCH WEST STATION"
+```
+
+```{r}
+# Fixing misspellings of Kipling Station
+ttc_bus_delays_2020_all["Location"][ttc_bus_delays_2020_all["Location"] == "KIOPLING STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="KIPOLING STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="KPLING STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="KPPSN - KIPLING STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="KPSN - KIPLING STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="KIPING STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="KIPLING  STATION"] <- "KIPLING STATION"
+```
+
+```{r}
+# Fixing misspellings of Lawrence and Lawrence West Stations
+lawrence_misspellings = "LAWERENCE|LWRENCE|LAREWNCE|LAWERANCE|LAWRECE|LAWRENE|LAWREMCE|LAWRENCEENCE"
+
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, lawrence_misspellings, "LAWRENCE")
+
+ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="OUTSIDE LAWRENCE STATION"
+                                       ] <- "LAWRENCE STATION"
+
+ttc_bus_delays_2020_all["Location"][ttc_bus_delays_2020_all["Location"] =="LAWRENCE WEST STATION\\"
+                                       ] <- "LAWRENCE WEST STATION"
+```
+
+```{r}
+# Fixing misspellings of Pioneer Village Station
+pioneer_misspellings <- "PINOEER|PIONEED|PIONEEER|PIONNER|POINEER"
+
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, pioneer_misspellings, "PIONEER")
+
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "VILAGE", "VILLAGE")
+
+ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] == "PIONEERVILLAGE STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="PIONEER STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="PIONEER VILLAGE"
+                                       ] <- "PIONEER VILLAGE STATION"
+```
+
+```{r}
+# Fixing misspellings of Scarborough Centre Station
+centre_misspellings = "CENTER |CENTE |CNETER |CENTRE` |CENTTRE |CENTRER |CENTR |CTR "
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, centre_misspellings, "CENTRE ")
+
+scarborough_misspellings = "SCAROBORUGH |SCAROBOROUGH |SCARBORUGH |SCARB |SCARBORO |SCARBUROUGH |SCARBOROUGHT |SWCARBOROUGH |SCAAROBORUGH |SCAROBORUGH |SCARBORUGH |SCARBORUOGH |SCARBROUGH |SACARBOROUGH |SCAEBOROUGH |SCAROROUGH |SCARBOROPUGH |SCARBOROUUGH |SCAARBOPROUGH |SCARBOPROUGH |SCAARBOROUGH |SCARBUROUGH |SCARBROUGH |SCARBUROUGN "
+
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "TWON","TOWN")
+
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, scarborough_misspellings, "SCARBOROUGH ")
+
+ttc_bus_delays_2020_all["Location"][ttc_bus_delays_2020_all["Location"] == "SCARBOROUGH CENTRE STA"|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town Centre")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town CenteR")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town Centr")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town  Centre")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town  Cente")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town CentTre")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town Centre Station")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town Station")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town Centre`")| 
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town CNEteR")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("Scarborough Town entre")| 
+                                      ttc_bus_delays_2020_all["Location"] =="SCARBOROUGH TOWN CENTRE S"|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("STC - Scar Town Centre")|
+                                      ttc_bus_delays_2020_all["Location"] ==toupper("carborough Town centre")|
+                                      ttc_bus_delays_2020_all["Location"] =="SCARBOROUGH CENTRE STA"|
+                                      ttc_bus_delays_2020_all["Location"] == "SCARBOROUGH CENTRE STAT"|
+                                      ttc_bus_delays_2020_all["Location"] =="SCARBOROUGH CENTRE ST" |
+                                      ttc_bus_delays_2020_all["Location"] == "SCARBOROUGH CENTRE"|
+                                      ttc_bus_delays_2020_all["Location"] =="STC"|
+                                      ttc_bus_delays_2020_all["Location"] =="SCAR TOWN CENTRE"|
+                                      ttc_bus_delays_2020_all["Location"] =="SCARBOROUGH CENRE STAT"
+                                    ] <- "SCARBOROUGH CENTRE STATION"
+```
+
+```{r}
+# Fixing misspellings of York Mills Station
+ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="YORKMILLS STN"|
+                                      ttc_bus_delays_2020_all["Location"] =="YORKMILLS STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="YORK MILLS STATION - J"|
+                                      ttc_bus_delays_2020_all["Location"] =="YONGE AND YORK MILLS STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="YONGE AND YORK MILLS STATION"] <- "YORK MILLS STATION"
+```
+
+
+The Locations data still needs to be cleaned up a lot. There are still inconsistencies in the entry of Locations.
+
+## Ensuring Consistency in Incident Descriptions
+
+```{r}
+ttc_bus_delays_2020_all["Incident"][ttc_bus_delays_2020_all["Incident"] == "Road Blocked - NON-TTC Collision"|
+                                      ttc_bus_delays_2020_all["Incident"] =="Road Block - Non-TTC Collision"|
+                                      ttc_bus_delays_2020_all["Incident"] =="Roadblock by Collision - Non-TTC"] <- "Collision - Non-TTC"
+
+ttc_bus_delays_2020_all["Incident"][ttc_bus_delays_2020_all["Incident"] == "Securitty"] <- "Security"
+
+ttc_bus_delays_2020_all["Incident"][ttc_bus_delays_2020_all["Incident"] == "Utilizing Off Route"] <- "Utilized Off Route"
+```
+
+
+## Adding Extra Info About Routes
+
+I made another csv file containing the names of Routes, the service type and the travel direction. This information was taken from the TTC website's description of Routes and Schedules. I joined this with the TTC's dataset.
+
+```{r}
+more_info_ttc_bus <- read_csv("TTCbusinfonew.csv")
+more_info_ttc_bus
+inner_join(ttc_bus_delays_2020_all, more_info_ttc_bus, by="Route") -> ttc_bus_delays_2020_all
+```
+
+# Analysis
+
+When riders are judging which routes are more likely to have delays, they may find it useful to consider the number of delays, the average delay time, and the median delay time. The average delay time may be more easily skewed by outliers or errors in data entry, so the median delay time is also shown. Moreover, some riders may be more willing to risk more minor delays rather than fewer large delays, while other individuals may not. Discretion is advised.
+
+# Bus Routes with the Most Delays
+
+```{r}
+ttc_bus_delays_2020_all %>% 
+  group_by(Route) %>%
+  summarise(`Number of Delays` = n(), `Average Delay Time` = mean(Delay_Time, na.rm=TRUE), `Median Delay Time` = median(Delay_Time, na.rm = TRUE)) %>%
+  arrange(desc(`Number of Delays`)) -> routedelays
+routedelays %>% inner_join(more_info_ttc_bus, by="Route") %>%
+  subset(select=c(1,5,2,4,3,6))
+```
+
+We see that the bus routes with the highest number of delays are following:
+
+### 1. 52 Lawrence West bus
+
+This bus travels east-west along Lawrence Avenue West. The main branch of the route is a frequent-service route. This means a bus is expected to come every 10 minutes or less from 6 a.m. to 1 a.m. Monday to Saturday, and from 8 a.m. to 1 a.m. on Sundays. 
+
+* The Eastbound bus destination signs are:
+  + 52 Lawrence West to Lawrence Station
+  + 52G Lawrence West to Lawrence West Station
+* The Westbound bus destination signs are:
+  + 52 Lawrence West to Lawrence Station
+  + 52A Lawrence West to Pearson Airport
+  + 52B Lawrence West to Westwood Extra Fare
+  + 52D Lawrence West to McNaughton Extra Fare
+  + 52F Lawrence West to Royal York
+  + 52G Lawrence West to Martin Grove via the Westway
+
+There is a 952 Lawrence West Express bus running on this route too. The 952 bus does not appear to be a frequent-service bus. The Eastbound 952 bus goes to Lawrence Station and the Westbound 952 goes to Pearson Airport. In 2020, the 952 Express had 73 delays, with an average delay time of around 9 minutes and a median delay time of 11 minutes. Interestingly, the 952 has much fewer delays than the 52 bus, and shorter delay times in general. Riders needing to travel along Lawrence Avenue West may find the 952 Express bus more reliable, and can expect fewer delays as well as shorter delay times.
+
+### 2. 32 Eglinton West bus
+
+This bus travels east-west along Eglinton Avenue West. The main branch of the route is a frequent-service route. This means a bus is expected to come every 10 minutes or less from 6 a.m. to 1 a.m. Monday to Saturday, and from 8 a.m. to 1 a.m. on Sundays. 
+
+* The Eastbound bus destination signs are:
+  + 32 Eglinton West to Eglinton Station via Eglinton West Station
+  + 32D Eglinton West to Eglinton West Station
+* The Westbound bus destination signs are:
+  + 32D Eglinton West to Jane & Emmett
+  + 32A Eglinton West to Renforth Station
+  + 32C Eglinton West to Jane & Lawrence via Trethewey
+  + 32F Eglinton West to Royal York & York Memorial Ci
+
+As of January 2022, there is no Express bus on the Eglinton West line. There is however, an Eglinton East Express bus which runs east of Eglinton Station. It would be interesting to examine the TTC dataset on ridership numbers and see if the 32 Eglinton West bus has enough demand to warrant an Express bus that could go through both the East and West sections of Eglinton Avenue.
+
+### 3. 133 Neilson bus
+
+This bus travels north-south between Finch Avenue East/Morningside Avenue and Scarborough Centre Station. The 133 bus runs every day, until 1 a.m. However, it is not a frequent service route. Depending on how riders plan their trips, they may need to wait longer than 10 minutes for the next bus.
+
+* The Northbound bus destination signs are:
+  +  133 Neilson to Morningside Heights
+  +  133 Neilson to Morningside Heights via Centenary
+* The Southbound bus destination signs are:
+  + 133 Neilson to Scarborough Centre
+  + 133 Neilson to Scarborough Centre via Centenary
+
+As of January 2022, there does not appear to be an Express bus servicing this route. Riders may find it beneficial to use an alternate route with more frequent and predictable service.
+
+# Delays in Local Buses vs Express Buses
+So far, the buses topping the list in terms of number of delays seem to be regular buses rather than express buses. Let's see if regular buses really get more delayed than express buses. The TTC also runs community and night buses but not as frequently as the regular or express buses. So we'll focus on comparing the delay times of regular and express buses.
+
+```{r}
+ttc_bus_delays_2020_all %>% filter(Service_Type %in% c("Regular", "Express")) -> ttc_bus_delays_types
+ttc_bus_delays_types %>% ggplot(aes(sample=Delay_Time)) + stat_qq() + stat_qq_line() + facet_grid(~Service_Type) + ggtitle("Normal QQ Plots for Delay Times")
+```
+
+Since the points on the Normal QQ Plots do not follow a straight line, the Regular and Express buses' Delay Times do not follow a normal distribution. Since the data is not normally distributed, a t-test would not be the best choice. Mood's Median Test is more suitable, as it does not require the populations to be normally distributed. We will use Mood's Median Test to see if the median Delay Time for the Regular buses is significantly higher than the median Delay Time for the Express buses.
+
+```{r}
+# Median Delay Time Across Both Groups
+ttc_bus_delays_types %>% summarize(med=median(Delay_Time)) %>% pull(med) -> median_delays_alltypes
+# Table Showing How Many Regular bus Delay Times are above or below Median Delay Time Across Both Types, How Many Express bus Delay Times are above or below Median Delay Time Across Both Types
+ttc_bus_delays_types %>% with(table(Service_Type,Delay_Time>median_delays_alltypes)) -> types_table
+types_table
+# Two Sided Chi-squared Test testing for association between median of Regular bus Delay Times, Express bus Delay Times
+chisq.test(types_table, correct = F)
+```
+
+From the table, we can see that nearly 76% of the Express bus delay times were below the median for the group with both types of buses. In contrast, only around 52% of the Regular bus delay times were below the median for Express and Regular buses.
+
+Mood's Median Test is a two-sided test, but if we want to consider the one-sided hypothesis that Regular bus Delay Times are greater than Express bus Delay Times, then we can consider half of the p-value. We can see that the p-value for the one-sided test is much smaller than $\alpha = 0.05$, the standard significance value used for testing. 
+
+Thus the median Delay Time for Regular buses was significantly larger than the median Delay Time for Express buses in 2020. It appears that Express bus arrival times were more reliable overall in 2020.
+
+# Delays in Eastbound/Westbound buses vs Northbound/Southbound buses
+In the past, I have heard Toronto residents talk about how the public transit system in Toronto is designed to bring people into the downtown core in the south of the city (as evidenced by the subway map), and how it is better for North to South travel rather than East to West travel. Thus I am curious to see if Eastbound/Westbound buses usually experience more delays than Northbound/Southbound buses. 
+
+```{r}
+ttc_bus_delays_2020_all %>% ggplot(aes(sample=Delay_Time)) + stat_qq() + stat_qq_line() + facet_grid(~Route_Direction) + ggtitle("Normal QQ Plots for Delay Times")
+```
+
+The East/West and North/South buses' Delay Times do not follow normal distributions, because the points on the Normal QQ Plots do not follow straight lines. Since the data is not normally distributed, we will not use a t-test to compare the two groups. We'll use Mood's Median Test since that doesn't require the delay times to be normally distributed. We will see if the median Delay Time for the East/West buses is significantly higher than the median Delay Time for the North/South buses.
+
+```{r}
+# Median Delay Time Across Both Groups
+ttc_bus_delays_2020_all %>% summarize(med=median(Delay_Time)) %>% pull(med) -> median_delays_alldir
+# Table Showing How Many E/W bus Delay Times are above or below Median Delay Time Across Both Types, How Many N/S bus Delay Times are above or below Median Delay Time Across Both Types
+ttc_bus_delays_2020_all %>% with(table(Route_Direction,Delay_Time>median_delays_alltypes)) -> dir_table
+dir_table
+# Two Sided Chi-squared Test testing for association between median of E/W bus Delay Times, N/S bus Delay Times
+chisq.test(dir_table, correct = F)
+```
+
+From the table, we can see that nearly 58% of the North/South bus delay times were below the median for the group with both types of buses. In contrast, only around 47% of the East/West bus delay times were below the median for Express and Regular buses.
+
+Mood's Median Test is a two-sided test. If we want to consider the one-sided hypothesis that East/West bus Delay Times are greater than North/South bus Delay Times, then we can consider half of the p-value. We can see that the p-value for the one-sided test is much smaller than $\alpha = 0.05$, the standard significance value used for testing. 
+
+Thus the median Delay Time for East/West buses was significantly larger than the median Delay Time for North/South buses in 2020. It appears that North/South buses were more reliable overall in 2020. This does lend some credibility towards the residents' notion that North/South travel is "better" than East/West travel in Toronto.
+
+
+# Incidents Causing Delays
+
+```{r}
+ttc_bus_delays_2020_all %>% 
+  group_by(Incident) %>%
+  summarise(`Number of Delays` = n(), `Average Delay Time` = mean(Delay_Time, na.rm=TRUE), `Median Delay Time` = median(Delay_Time, na.rm = TRUE)) %>%
+  arrange(desc(`Number of Delays`)) -> ttc_bus_delays_incidents
+ttc_bus_delays_incidents %>% ggplot(aes(y=Incident, x=`Number of Delays`)) + geom_col() + ggtitle("Number of Delays by Incident")
+ttc_bus_delays_incidents %>% ggplot(aes(y=Incident, x=`Median Delay Time`)) + geom_col() + ggtitle("Median Delay Time by Incident")
+```
+
+The most common cause of delay was mechanical issues, and on average, it resulted in a delay time of approximately 13 minutes. 
+
+The cause of delay that resulted in the longest average and median delay times was bus drivers using diversions from the specified routes, for example, due to road blockages caused by construction or traffic accidents. If the delay time was measured by how long it took for the bus to get to the stop on the original route, and the bus drivers were no longer able to get to the stop since the route changed, it would make sense that the delay times would be much longer.
+
+## Delays Involving TTC vehicle Collisions vs Non-TTC vehicle Collisions
+
+The cause of delay that resulted in the second longest average and median delay times was collisions of non-TTC vehicles causing road blockages. Interestingly, if a rider was expecting a delay due to a collision, if the collision was between non-TTC vehicles only, the average delay time was over 6 times that of a delay time caused by a collision involving a TTC vehicle. The median delay time was over 4 times that of a delay time caused by a collision involving a TTC vehicle. We do want to note that this is a result pertaining to what you can expect given that there is a delay caused by a collision, not what to expect when there is a collision.
+
+Here we will see if there indeed is a statistically significant difference between the delay times for collisions involving TTC vehicles, and collisions not involving TTC vehicles. To determine what statistical test would be best for comparing the two groups, we will first test the normality of the data and see if the standard deviations of the two groups are the same.
+
+```{r}
+ttc_bus_delays_2020_all %>% filter(Incident %in% c("Collision - TTC", "Collision - Non-TTC")) -> ttc_bus_delays_collisions 
+
+ttc_bus_delays_collisions %>% ggplot(aes(sample=Delay_Time)) + stat_qq() + stat_qq_line() + facet_grid(~Incident) + ggtitle("Normal QQ Plots for Delay Times")
+ttc_bus_delays_collisions %>% ggplot(aes(x=Incident, y =Delay_Time)) + geom_boxplot() + ggtitle("Delay Time for Types of Collisions")
+```
+
+The delay time is not normally distributed among the Collision - Non-TTC group because the points on the Normal QQ Plot don't follow a straight line. The standard deviations between the two groups is not the same, since the boxplot for the Collision - TTC group seems to be much shorter than the one for the Collision - Non-TTC group. 
+
+So a t-test would not be the best choice here since the data is not normally distributed and the two groups do not have the same standard deviations. We will instead use Mood's Median Test to see if the median Delay Time for the Non-TTC Collision group is significantly higher than the median Delay Time for the TTC Collision group.
+
+```{r}
+# Median Delay Time Across Both Collision Groups
+ttc_bus_delays_collisions %>% summarize(med=median(Delay_Time)) %>% pull(med) -> median_delays_allcollisions
+# Table Showing How Many TTC Collision Delay Times are above or below Median Delay Time Across Both Collision Groups, How Many Non-TTC Collision Delay Times are above or below Median Delay Time Across Both Collision Groups
+ttc_bus_delays_collisions %>% with(table(Incident,Delay_Time>median_delays_allcollisions)) -> collision_table
+collision_table
+# Two Sided Chi-squared Test testing for association between median of TTC Collision Delay Times, Non-TTC Collision Delay Times
+chisq.test(collision_table, correct = F)
+```
+
+Note that nearly 81% of TTC collision delay times are below the median across both groups, while nearly 17% of non-TTC delay times are below that threshold.
+
+Mood's Median Test is a two-sided test, but if we want to consider the one-sided hypothesis that Non-TTC Collision Delay Times are greater than TTC Collision Delay Times, then we can consider half of the p-value. We can see that the p-value for the one-sided test is much smaller than $\alpha = 0.05$, the standard significance value used for testing. 
+
+Thus the median Delay Time for delays caused by Non-TTC Collisions was significantly larger than the median Delay Time for delays caused by TTC Collisions in 2020.
+
+# Summary of Findings
+
++ Routes with Most Delays: 52	Lawrence West, 32	Eglinton West, 133 Neilson
++ Incident Causing Most Delays: Mechanical issues
++ Incidents Causing Longest Delays on Average: Diversions, Non-TTC Collisions
+
+* The median delay time for Regular buses was significantly larger than that of Express buses. 
+* The median delay time for East/West buses was significantly larger than that of North/South buses.
+* The median delay time for Non-TTC Collisions is significantly higher than that of TTC Collisions.
+
+# Work In Progress and Further Avenues for Exploration
+
+## Locations with the Most Delays
+
+I have fixed inconsistencies in the spellings of many high-traffic Locations, however there are likely many more that still need to be fixed. Premature experimentation suggests that Scarborough Centre Station and Kennedy Station likely experienced the most delays in 2020. So far, it seems like Subway Stations and Garages experience the highest number of delays. This would make sense since many mechanical repairs, cleaning are done by employees at these locations.
+
+```{r}
+ttc_bus_delays_2020_all %>% group_by(Location) %>%
+  summarise(`Number of Delays` = n(), `Average Delay Time` = mean(Delay_Time, na.rm=TRUE), `Median Delay Time` = median(Delay_Time, na.rm = TRUE)) %>%
+  arrange(desc(`Number of Delays`))
+```
+
+## When Do Most Delays Happen?
+It'd be interesting to see what times, days and seasons experience the most delays. It would be interesting to download weather data and match it to the incidents by date and time. Then it may be possible to see if low temperatures and precipitation may be correlated with more mechanical repairs, collisions or diversions.
+
+## Subway and Streetcar Delays
+The TTC bus network is connected to its subway network and its streetcar network. It would be interesting to see if delays in the subway may affect delays in buses (eg due to increased passenger load) and vice versa. The TTC also posts datasets for Subway Delay Times and Streetcar Delay Times, so those would be interesting to explore.
+
+## Impact of COVID-19 Service Cuts
+
+I would like to run similar code on the data for other years and see if some of the results are just a specific to the 2020 data. Due to the COVID-19 pandemic, the TTC had to cut service to many bus lines, in part due to decreased ridership during lockdowns. Many TTC employees working roles that involved facing the public were at high risk of contracting the COVID-19 virus. It is possible that many employees had to self-isolate during 2020, thus reducing the number of people available to drive buses and do repairs.
+
+I wonder how such service changes may have affected the delay times of the buses. For example, would you expect more delays during a pandemic when there is less service, or would you expect more delays during non-pandemic times when there is more traffic? If I could find enough reliable information about TTC service in the TTC website's News archives, I'd like to make another column containing information about frequency of bus service (eg how many minutes between arrival of consecutive buses). The TTC has also posted Next Vehicle Arrival Time datasets so that may be promising to explore.
+
+## Model for Predicting Delay Time
+I would like to create a model for predicting delay time. I would consider different regression models, feature selection on training/test sets, and possibly more to see what variables are most predictive of delay time. Possible candidates include Direction, Location (eg. is it subway station, is it garage), frequency of service, Incident type, and more.
+
+# References
+
+https://ttc.ca/routes-and-schedules#/
+https://sharlagelfand.github.io/opendatatoronto/articles/articles/multisheet_resources.html
+https://www.statology.org/replace-values-in-data-frame-r/
+https://ritsokiguess.site/STAC33/notes.html
+https://community.rstudio.com/t/understanding-the-use-of-str-replace-all-with-multiple-patterns/1849/2
+https://open.toronto.ca/catalogue/?search=ttc&sort=score%20desc
+https://www.publictransportation.org/transit-benefits/grows-communities/
