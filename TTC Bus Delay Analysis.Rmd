@@ -135,6 +135,11 @@ ttc_bus_delays_2020_all$Location = str_remove_all(ttc_bus_delays_2020_all$Locati
 ```
 
 ```{r}
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, " W " , " WEST ")
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, " E " , " EAST ")
+```
+
+```{r}
 # Fixing misspellings of Eglinton Station
 ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "EGLINGTON" , "EGLINTON")
 
@@ -232,13 +237,21 @@ ttc_bus_delays_2020_all["Location"][ttc_bus_delays_2020_all["Location"] == "SCAR
                                     ] <- "SCARBOROUGH CENTRE STATION"
 ```
 
+
+```{r}
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "VIC PRK" , "VICTORIA PARK")
+
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "STEELS" , "STEELES")
+```
+
 ```{r}
 # Fixing misspellings of York Mills Station
 ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="YORKMILLS STN"|
                                       ttc_bus_delays_2020_all["Location"] =="YORKMILLS STATION"|
                                       ttc_bus_delays_2020_all["Location"] =="YORK MILLS STATION - J"|
                                       ttc_bus_delays_2020_all["Location"] =="YONGE AND YORK MILLS STATION"|
-                                      ttc_bus_delays_2020_all["Location"] =="YONGE AND YORK MILLS STATION"] <- "YORK MILLS STATION"
+                                      ttc_bus_delays_2020_all["Location"] =="YONGE AND YORK MILLS STATION"|
+                                      ttc_bus_delays_2020_all["Location"] =="YORK MILL STATION"] <- "YORK MILLS STATION"
 ```
 
 
