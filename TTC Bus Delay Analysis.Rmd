@@ -111,7 +111,10 @@ ttc_bus_delays_2020_all <- ttc_bus_delays_2020_all %>%
 ttc_bus_delays_2020_all %>% filter(Delay_Time >0) -> ttc_bus_delays_2020_all
 ```
 
+<<<<<<< HEAD
 There were MANY inconsistencies in the spellings and capitalizations of the recorded locations of the buses. For example, Scarborough Centre Station was entered as "SCARBOROUGH CENTRE STA", "Scarborough Town Centre", "Scarborough Centre STN", "Scarborough Town Center", just to name a few. All Locations will be changed to all caps to ensure consistency in capitalization. They will also follow the same spelling on the TTC website (https://ttc.ca/routes-and-schedules#/). Analysis on Locations of Delays is a work in progress, and many locations that are not subway stations are still entered inconsistently and/or spelled incorrectly. I hope to continue further processing the data so that the location names can be as consistent as possible. So far I have merged close to 1000 alternate spellings and capitalizations into the appropriate groups.
+=======
+There were MANY inconsistencies in the spellings and capitalizations of the recorded locations of the buses. For example, Scarborough Centre Station was entered as "SCARBOROUGH CENTRE STA", "Scarborough Town Centre", "Scarborough Centre STN", "Scarborough Town Center", just to name a few. All Locations will be changed to all caps to ensure consistency in capitalization. They will also follow the same spelling on the TTC website (https://ttc.ca/routes-and-schedules#/). Analysis on Locations of Delays is a work in progress, and many locations that are not subway stations are still entered inconsistently and/or spelled incorrectly. I hope to continue further processing the data so that the location names can be as consistent as possible. So far I have merged nearly 1000 Locations with alternate spellings and capitalizations into the appropriate groups.
 
 ## Ensuring Consistency of Spellings and Capitalizations
 
