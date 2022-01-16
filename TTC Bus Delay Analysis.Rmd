@@ -1,6 +1,6 @@
 ---
 title: "An Analysis of Toronto Transit Commission (TTC) Bus Delay Data 2020"
-author: 'Alice Huang, email: alice9999@protonmail.com'
+author: 'Alice Huang'
 output:
   html_document:
     df_print: paged
@@ -111,7 +111,7 @@ ttc_bus_delays_2020_all <- ttc_bus_delays_2020_all %>%
 ttc_bus_delays_2020_all %>% filter(Delay_Time >0) -> ttc_bus_delays_2020_all
 ```
 
-There were MANY inconsistencies in the spellings and capitalizations of the recorded locations of the buses. For example, Scarborough Centre Station was entered as "SCARBOROUGH CENTRE STA", "Scarborough Town Centre", "Scarborough Centre STN", "Scarborough Town Center", just to name a few. All Locations will be changed to all caps to ensure consistency in capitalization. They will also follow the same spelling on the TTC website (https://ttc.ca/routes-and-schedules#/). Analysis on Locations of Delays is a work in progress, and many locations that are not subway stations are still entered inconsistently and/or spelled incorrectly. I hope to continue further processing the data so that the location names can be as consistent as possible.
+There were MANY inconsistencies in the spellings and capitalizations of the recorded locations of the buses. For example, Scarborough Centre Station was entered as "SCARBOROUGH CENTRE STA", "Scarborough Town Centre", "Scarborough Centre STN", "Scarborough Town Center", just to name a few. All Locations will be changed to all caps to ensure consistency in capitalization. They will also follow the same spelling on the TTC website (https://ttc.ca/routes-and-schedules#/). Analysis on Locations of Delays is a work in progress, and many locations that are not subway stations are still entered inconsistently and/or spelled incorrectly. I hope to continue further processing the data so that the location names can be as consistent as possible. So far I have merged close to 1000 alternate spellings and capitalizations into the appropriate groups.
 
 ## Ensuring Consistency of Spellings and Capitalizations
 
@@ -124,7 +124,7 @@ station_misspellings = "STN|STATION|STATON|STTION|STATIION|STTAION|STATIOMN|STAT
 
 ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, station_misspellings, "STATION")
 
-# Consistency between "&" and "AND"
+# Consistency between conjunctions between two street names at an intersection
 and_misspellings = " & | / | @ | AT "
 ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, and_misspellings , " AND ")
 # some locations were entered with '/' without any spaces around them
@@ -135,14 +135,13 @@ ttc_bus_delays_2020_all$Location = str_remove_all(ttc_bus_delays_2020_all$Locati
 ```
 
 ```{r}
-ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, " W " , " WEST ")
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, " W | WESTT " , " WEST ")
 ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, " E " , " EAST ")
 ```
 
 ```{r}
 # Fixing misspellings of Eglinton Station
 ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "EGLINGTON" , "EGLINTON")
-
 
 ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="EGLINTON STATION (RAD VEHICLE)"|
                                       ttc_bus_delays_2020_all["Location"] =="POD EGLINTON STATION"|
@@ -163,13 +162,13 @@ ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] ==  "F
 ```
 
 ```{r}
+ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="KENNEDY STATION " ] <- "KENNEDY STATION"
+
 # Fixing misspellings of Kipling Station
-ttc_bus_delays_2020_all["Location"][ttc_bus_delays_2020_all["Location"] == "KIOPLING STATION"|
-                                      ttc_bus_delays_2020_all["Location"] =="KIPOLING STATION"|
-                                      ttc_bus_delays_2020_all["Location"] =="KPLING STATION"|
-                                      ttc_bus_delays_2020_all["Location"] =="KPPSN - KIPLING STATION"|
+kipling_misspellings = "KIOPLING|KIPOLING|KPLING|KIPING"
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, kipling_misspellings, "KIPLING")
+ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="KPPSN - KIPLING STATION"|
                                       ttc_bus_delays_2020_all["Location"] =="KPSN - KIPLING STATION"|
-                                      ttc_bus_delays_2020_all["Location"] =="KIPING STATION"|
                                       ttc_bus_delays_2020_all["Location"] =="KIPLING  STATION"] <- "KIPLING STATION"
 ```
 
@@ -233,23 +232,29 @@ ttc_bus_delays_2020_all["Location"][ttc_bus_delays_2020_all["Location"] == "SCAR
                                       ttc_bus_delays_2020_all["Location"] == "SCARBOROUGH CENTRE"|
                                       ttc_bus_delays_2020_all["Location"] =="STC"|
                                       ttc_bus_delays_2020_all["Location"] =="SCAR TOWN CENTRE"|
-                                      ttc_bus_delays_2020_all["Location"] =="SCARBOROUGH CENRE STAT"
+                                      ttc_bus_delays_2020_all["Location"] =="SCARBOROUGH CENRE STAT"|
+                                      ttc_bus_delays_2020_all["Location"] =="SCARBOROUGH TOWN CENTE"|
+                                      ttc_bus_delays_2020_all["Location"] =="SCAR TOWN CTR"
                                     ] <- "SCARBOROUGH CENTRE STATION"
 ```
 
 
 ```{r}
-ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "VIC PRK" , "VICTORIA PARK")
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "VIC PRK|VIC PARK" , "VICTORIA PARK")
 
 ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "STEELS" , "STEELES")
+
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location, "DON MILL |DON MILLL" , "DON MILLS")
+
+ellesmere_misspellings = "ELLEMSERE |ELLEMERES |ELLESEMER |ELLESMER |ELLESEMERE "
+
+ttc_bus_delays_2020_all$Location = str_replace_all(ttc_bus_delays_2020_all$Location,  ellesmere_misspellings, "ELLESMERE ")
 ```
 
 ```{r}
 # Fixing misspellings of York Mills Station
-ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="YORKMILLS STN"|
-                                      ttc_bus_delays_2020_all["Location"] =="YORKMILLS STATION"|
+ttc_bus_delays_2020_all["Location"][  ttc_bus_delays_2020_all["Location"] =="YORKMILLS STATION"|
                                       ttc_bus_delays_2020_all["Location"] =="YORK MILLS STATION - J"|
-                                      ttc_bus_delays_2020_all["Location"] =="YONGE AND YORK MILLS STATION"|
                                       ttc_bus_delays_2020_all["Location"] =="YONGE AND YORK MILLS STATION"|
                                       ttc_bus_delays_2020_all["Location"] =="YORK MILL STATION"] <- "YORK MILLS STATION"
 ```
@@ -456,7 +461,7 @@ Thus the median Delay Time for delays caused by Non-TTC Collisions was significa
 
 ## Locations with the Most Delays
 
-I have fixed inconsistencies in the spellings of many high-traffic Locations, however there are likely many more that still need to be fixed. Premature experimentation suggests that Scarborough Centre Station and Kennedy Station likely experienced the most delays in 2020. So far, it seems like Subway Stations and Garages experience the highest number of delays. This would make sense since many mechanical repairs, cleaning are done by employees at these locations.
+I have fixed inconsistencies in the spellings of many high-traffic Locations, however there are likely many more that still need to be fixed. In particular, the Pearson Airport, Centennial College Loop, and U of T Scarborough locations still contain some inconsistencies. Premature experimentation suggests that Scarborough Centre Station and Kennedy Station likely experienced the most delays in 2020. So far, it seems like Subway Stations and Garages experience the highest number of delays. This would make sense since many mechanical repairs, cleaning are done by employees at these locations.
 
 ```{r}
 ttc_bus_delays_2020_all %>% group_by(Location) %>%
