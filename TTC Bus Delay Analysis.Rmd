@@ -99,7 +99,7 @@ ttc_bus_delays_2020_all <- bind_rows(jan2020_bus_delays,
                                      dec2020_bus_delays)
 ```
 
-For some months, the delay time in minutes was entered in a column called `Delay`, while in other months, it was entered in a column called `Min Delay`. I assumed that both columns contained the delay time in minutes though the readme file only had instructions for `Min Delay` column. I made a new column called `Delay_Time` that combined the data from the two columns, and removed the `Delay` and `Min Delay` columns. Unfortunately, some Delay Times were entered as 0. Since it didn't make sense to have a delay with delay time 0, those instances were filtered out.
+For some months, the delay time in minutes was entered in a column called `Delay`, while in other months, it was entered in a column called `Min Delay`. I assumed that both columns contained the delay time in minutes though the readme file only had instructions for `Min Delay` column. I made a new column called `Delay_Time` that combined the data from the two columns, and removed the `Delay` and `Min Delay` columns. Unfortunately, some Delay Times were entered as 0. Since it didn't make sense to have a delay with delay time 0, instances with delay time 0 were removed.
 
 ```{r include=FALSE}
 # Combining the two minute delay columns
@@ -112,9 +112,9 @@ ttc_bus_delays_2020_all <- ttc_bus_delays_2020_all %>%
 ttc_bus_delays_2020_all %>% filter(Delay_Time >0) -> ttc_bus_delays_2020_all
 ```
 
-There were MANY inconsistencies in the spellings and capitalizations of the recorded locations of the buses. For example, Scarborough Centre Station was entered as "SCARBOROUGH CENTRE STA", "Scarborough Town Centre", "Scarborough Centre STN", "Scarborough Town Center", just to name a few. All Locations were changed to all caps to ensure consistency in capitalization. They will also follow the same spelling on the TTC website (https://ttc.ca/routes-and-schedules#/). Many common words occurring in location names like "Station" and "Ellesmere" were changed to the correct spelling. Analysis on Locations of Delays is a work in progress, and some locations are still entered inconsistently and/or spelled incorrectly. I hope to continue further processing the data so that the location names can be as consistent as possible. So far I have merged close to 1000 alternate spellings and capitalizations into the appropriate groups.
-
 ## Ensuring Consistency of Spellings and Capitalizations
+
+There were MANY inconsistencies in the spellings and capitalizations of the recorded locations of the buses. For example, Scarborough Centre Station was entered as "SCARBOROUGH CENTRE STA", "Scarborough Town Centre", "Scarborough Centre STN", "Scarborough Town Center", just to name a few. All Locations were changed to all caps to ensure consistency in capitalization. They will also follow the same spelling on the TTC website (https://ttc.ca/routes-and-schedules#/). Many common words occurring in location names like "Station" and "Ellesmere" were changed to the correct spelling. Analysis on Locations of Delays is a work in progress, and some locations are still entered inconsistently and/or spelled incorrectly. I hope to continue further processing the data so that the location names can be as consistent as possible. So far I have merged close to 1000 alternate spellings and capitalizations into the appropriate groups.
 
 ```{r Fixing spellings in data, include=FALSE}
 # Converting everything to all caps
@@ -267,7 +267,7 @@ The Locations data still needs to be cleaned up a lot. There are still inconsist
 
 There were several instances where Incidents were entered inconsistently. For example, there were instances where the incident description was entered as "Road Blocked - NON-TTC Collision", "Road Block - Non-TTC Collision", "Roadblock by Collision - Non-TTC". These were combined into one group with incident description "Collision - Non-TTC".
 
-```{r}
+```{r include=FALSE}
 ttc_bus_delays_2020_all["Incident"][ttc_bus_delays_2020_all["Incident"] == "Road Blocked - NON-TTC Collision"|
                                       ttc_bus_delays_2020_all["Incident"] =="Road Block - Non-TTC Collision"|
                                       ttc_bus_delays_2020_all["Incident"] =="Roadblock by Collision - Non-TTC"] <- "Collision - Non-TTC"
@@ -359,12 +359,13 @@ ttc_bus_delays_2020_all %>% filter(Service_Type %in% c("Regular", "Express")) ->
 ttc_bus_delays_types %>% ggplot(aes(x=Service_Type, y =Delay_Time)) + geom_boxplot() + ggtitle("Delay Time for Regular and Express Buses")
 ```
 
+So far, it seems that the mean delay time for regular buses is larger than the mean delay times of the express buses. To determine the best statistical test, we'll use Normal Quantile-Quantile plots to determine if the delay times are normally distributed.
 
 ```{r echo=FALSE}
 ttc_bus_delays_types %>% ggplot(aes(sample=Delay_Time)) + stat_qq() + stat_qq_line() + facet_grid(~Service_Type) + ggtitle("Normal QQ Plots for Delay Times")
 ```
 
-Since the points on the Normal QQ Plots do not follow a straight line, the Regular and Express buses' Delay Times do not follow a normal distribution. Since the data is not normally distributed, a t-test would not be the best choice. Mood's Median Test is more suitable, as it does not require the populations to be normally distributed. We will use Mood's Median Test to see if the median Delay Time for the Regular buses is significantly higher than the median Delay Time for the Express buses.
+Since the points on the Normal QQ Plots do not follow a straight line, the Regular and Express buses' Delay Times are skewed and do not follow a normal distribution. Since the data is not normally distributed, we cannot use t-tests. Mood's Median Test is more suitable, as it does not require the populations to be normally distributed. We will use Mood's Median Test to see if the median Delay Time for the Regular buses is significantly higher than the median Delay Time for the Express buses.
 
 First we'll find the median across both Express and Regular groups combined. Then we will see how many Regular bus delay times are greater than this median, and how many Express bus delay times are greater than this median. This gives us the following table.
 
@@ -387,6 +388,22 @@ chisq.test(types_table, correct = F)
 Mood's Median Test is a two-sided test, but if we want to consider the one-sided hypothesis that Regular bus Delay Times are greater than Express bus Delay Times, then we can consider half of the p-value. We can see that the p-value for the one-sided test is much smaller than $\alpha = 0.05$, the standard significance value used for testing. 
 
 Thus the median Delay Time for Regular buses was significantly larger than the median Delay Time for Express buses in 2020. It appears that Express bus arrival times were more reliable overall in 2020.
+
+
+## Experiment with Chebyshev's bound for Confidence Intervals
+We could try using Chebyshev's bound to come up with confidence intervals for the Regular bus and Express bus delay times. Chebyshev's bound states that $1 - \frac{1}{k^2}$ percent of the distribution's values are within $k$ standard deviations of the mean. By Chebyshev's bound, 96% of a distribution's values are 5 standard deviations away from the mean. So a 96% confidence interval would correspond to $(\bar{x} - 5s, \bar{x} + 5s)$ where $\bar{x}$ is the mean and $s$ is the standard deviation. 
+
+```{r echo=FALSE}
+ttc_bus_delays_types %>% filter(Service_Type == "Regular") %>%
+  select(Delay_Time) %>%
+  summarize(Regular_Mean = mean(Delay_Time), Regular_SD = sd(Delay_Time), CI_Regular = str_c("( ", mean(Delay_Time)-5*sd(Delay_Time), " , ", mean(Delay_Time)+5*sd(Delay_Time), " )"))
+
+ttc_bus_delays_types %>% filter(Service_Type == "Express") %>%
+  select(Delay_Time) %>%
+  summarize(Express_Mean = mean(Delay_Time), Express_SD = sd(Delay_Time), CI_Express = str_c("( ", mean(Delay_Time)-5*sd(Delay_Time), " , ", mean(Delay_Time)+5*sd(Delay_Time), " )"))
+```
+
+We can see that the 96% confidence intervals generated by Chebyshev's rule are quite large. When using Chebyshev's rule to construct 95% confidence intervals, we need to include data up to 4.5 standard deviations away from the mean, but when the data is normal we can just include 2 standard deviations instead of 4.5. So Chebyshev's bounds are less efficient compared to Gaussian bounds. Chebyshev's bound gives very large estimates but it can be somewhat useful for instances where we can't assume normality of the data.
 
 # Delays in Eastbound/Westbound buses vs Northbound/Southbound buses
 In the past, I have heard Toronto residents talk about how the public transit system in Toronto is designed to bring people into the downtown core in the south of the city (as evidenced by the subway map), and how it is better for North to South travel rather than East to West travel. Thus I am curious to see if Eastbound/Westbound buses usually experience more delays than Northbound/Southbound buses.
@@ -523,14 +540,23 @@ I would like to run similar code on the data for other years and see if some of 
 I wonder how such service changes may have affected the delay times of the buses. For example, would you expect more delays during a pandemic when there is less service, or would you expect more delays during non-pandemic times when there is more traffic? If I could find enough reliable information about TTC service in the TTC website's News archives, I'd like to make another column containing information about frequency of bus service (eg how many minutes between arrival of consecutive buses). The TTC has also posted Next Vehicle Arrival Time datasets so that may be promising to explore.
 
 ## Model for Predicting Delay Time
-I would like to create a model for predicting delay time. I would consider different regression models, feature selection on training/test sets, and possibly more to see what variables are most predictive of delay time. Possible candidates include Direction, Location (eg. is it subway station, is it garage), frequency of service, Incident type, and more.
+I would like to create a model for predicting delay time. I would consider different regression models, feature selection on training/test sets using LASSO, and possibly more to see what variables are most predictive of delay time. Possible candidates include Direction, Location (eg. is it subway station, is it garage), frequency of service, Incident type, and more.
 
 # References
 
 https://ttc.ca/routes-and-schedules#/
+
+
 https://sharlagelfand.github.io/opendatatoronto/articles/articles/multisheet_resources.html
+
 https://www.statology.org/replace-values-in-data-frame-r/
+
 https://ritsokiguess.site/STAC33/notes.html
+
 https://community.rstudio.com/t/understanding-the-use-of-str-replace-all-with-multiple-patterns/1849/2
+
 https://open.toronto.ca/catalogue/?search=ttc&sort=score%20desc
+
 https://www.publictransportation.org/transit-benefits/grows-communities/
+
+https://towardsdatascience.com/what-if-your-data-is-not-normal-d7293f7b8f0
