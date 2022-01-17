@@ -353,8 +353,14 @@ As of January 2022, there does not appear to be an Express bus servicing this ro
 # Delays in Local Buses vs Express Buses
 So far, the buses topping the list in terms of number of delays seem to be regular buses rather than express buses. Let's see if regular buses really get more delayed than express buses. The TTC also runs community and night buses but not as frequently as the regular or express buses. So we'll focus on comparing the delay times of regular and express buses.
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.height=10, fig.width=8}
 ttc_bus_delays_2020_all %>% filter(Service_Type %in% c("Regular", "Express")) -> ttc_bus_delays_types
+
+ttc_bus_delays_types %>% ggplot(aes(x=Service_Type, y =Delay_Time)) + geom_boxplot() + ggtitle("Delay Time for Regular and Express Buses")
+```
+
+
+```{r echo=FALSE}
 ttc_bus_delays_types %>% ggplot(aes(sample=Delay_Time)) + stat_qq() + stat_qq_line() + facet_grid(~Service_Type) + ggtitle("Normal QQ Plots for Delay Times")
 ```
 
@@ -383,7 +389,12 @@ Mood's Median Test is a two-sided test, but if we want to consider the one-sided
 Thus the median Delay Time for Regular buses was significantly larger than the median Delay Time for Express buses in 2020. It appears that Express bus arrival times were more reliable overall in 2020.
 
 # Delays in Eastbound/Westbound buses vs Northbound/Southbound buses
-In the past, I have heard Toronto residents talk about how the public transit system in Toronto is designed to bring people into the downtown core in the south of the city (as evidenced by the subway map), and how it is better for North to South travel rather than East to West travel. Thus I am curious to see if Eastbound/Westbound buses usually experience more delays than Northbound/Southbound buses. 
+In the past, I have heard Toronto residents talk about how the public transit system in Toronto is designed to bring people into the downtown core in the south of the city (as evidenced by the subway map), and how it is better for North to South travel rather than East to West travel. Thus I am curious to see if Eastbound/Westbound buses usually experience more delays than Northbound/Southbound buses.
+
+```{r echo=FALSE, fig.height=10, fig.width=8}
+ttc_bus_delays_2020_all %>% ggplot(aes(x=Route_Direction, y =Delay_Time)) + geom_boxplot() + ggtitle("Delay Time for Eastbound/Westbound and Northbound/Southbound buses")
+```
+
 
 ```{r echo=FALSE}
 ttc_bus_delays_2020_all %>% ggplot(aes(sample=Delay_Time)) + stat_qq() + stat_qq_line() + facet_grid(~Route_Direction) + ggtitle("Normal QQ Plots for Delay Times")
@@ -434,7 +445,7 @@ The cause of delay that resulted in the longest average and median delay times w
 
 The cause of delay that resulted in the second longest average and median delay times was collisions of non-TTC vehicles causing road blockages. Interestingly, if a rider was expecting a delay due to a collision, if the collision was between non-TTC vehicles only, the average delay time was over 6 times that of a delay time caused by a collision involving a TTC vehicle. The median delay time was over 4 times that of a delay time caused by a collision involving a TTC vehicle. We do want to note that this is a result pertaining to what you can expect given that there is a delay caused by a collision, not what to expect when there is a collision.
 
-Here we will see if there indeed is a statistically significant difference between the delay times for collisions involving TTC vehicles, and collisions not involving TTC vehicles. To determine what statistical test would be best for comparing the two groups, we will first test the normality of the data and see if the standard deviations of the two groups are the same.
+Here we will see if there indeed is a statistically significant difference between the delay times for collisions involving TTC vehicles, and collisions not involving TTC vehicles. 
 
 ```{r echo=FALSE}
 ttc_bus_delays_2020_all %>% filter(Incident %in% c("Collision - TTC", "Collision - Non-TTC")) -> ttc_bus_delays_collisions 
@@ -442,7 +453,7 @@ ttc_bus_delays_2020_all %>% filter(Incident %in% c("Collision - TTC", "Collision
 ttc_bus_delays_collisions %>% ggplot(aes(x=Incident, y =Delay_Time)) + geom_boxplot() + ggtitle("Delay Time for Types of Collisions")
 ```
 
-We can see that the standard deviations between the two groups is not the same, since the boxplot for the Collision - TTC group seems to be much shorter than the one for the Collision - Non-TTC group.
+We can see that the standard deviation for the Collision - TTC group seems to be smaller than the one for the Collision - Non-TTC group. To determine what statistical test would be best for comparing the two groups, we will first test the normality of the data and see if the standard deviations of the two groups are the same.
 
 ```{r echo = FALSE}
 ttc_bus_delays_collisions %>% ggplot(aes(sample=Delay_Time)) + stat_qq() + stat_qq_line() + facet_grid(~Incident) + ggtitle("Normal QQ Plots for Delay Times")
@@ -489,7 +500,7 @@ Thus the median Delay Time for delays caused by Non-TTC Collisions was significa
 
 ## Locations with the Most Delays
 
-I have fixed inconsistencies in the spellings of many high-traffic Locations, however there are likely many more that still need to be fixed. In particular, the Pearson Airport, Centennial College Loop, and U of T Scarborough locations still contain some inconsistencies. Premature experimentation suggests that Scarborough Centre Station and Kennedy Station likely experienced the most delays in 2020. So far, it seems like Subway Stations and Garages experience the highest number of delays. This would make sense since many mechanical repairs, cleaning are done by employees at these locations.
+I have fixed inconsistencies in the spellings of many high-traffic Locations, however there are likely more that still need to be fixed. In particular, the Pearson Airport, Centennial College Loop, and U of T Scarborough locations still contain some inconsistencies. Premature experimentation suggests that Scarborough Centre Station and Kennedy Station likely experienced the most delays in 2020. So far, it seems like Subway Stations and Garages experience the highest number of delays. This would make sense since many mechanical repairs, cleaning are done by employees at these locations.
 
 ```{r echo=FALSE}
 ttc_bus_delays_2020_all %>% group_by(Location) %>%
