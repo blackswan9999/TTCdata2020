@@ -437,7 +437,7 @@ or_types <- oddsratio(types_table)
 or_types
 ```
 
-We see that the odds of a regular bus having a delay time greater than the median is nearly 2.98 times that the odds of an express bus having a delay time greater than the median.
+We see that the odds of a regular bus having a delay time greater than the median is nearly 2.98 times the odds of an express bus having a delay time greater than the median.
 
 # Delays in Eastbound/Westbound buses vs Northbound/Southbound buses
 In the past, I have heard Toronto residents talk about how the public transit system in Toronto is designed to bring people into the downtown core in the south of the city (as evidenced by the subway map), and how it is better for North to South travel rather than East to West travel. Thus I am curious to see if Eastbound/Westbound buses usually experience longer delays than Northbound/Southbound buses.
@@ -460,22 +460,55 @@ First we'll find the median across both Eastbound/Westbound and Northbound/South
 ttc_bus_delays_2020_all %>% summarize(med=median(Delay_Time)) %>% pull(med) -> median_delays_alldir
 # Table Showing How Many E/W bus Delay Times are above or below Median Delay Time Across Both Types, How Many N/S bus Delay Times are above or below Median Delay Time Across Both Types
 ttc_bus_delays_2020_all %>% with(table(Route_Direction,Delay_Time>median_delays_alltypes)) -> dir_table
+dir_table <- dir_table[2:1,]
 dir_table
 ```
 
 From the table, we can see that nearly 58% of the North/South bus delay times were below the median for the group with both types of buses. In contrast, only around 47% of the East/West bus delay times were below the median for Express and Regular buses.
 
-We now run a two-sided Pearson chi-square test for testing the association between median Eastbound/Westbound bus Delay Times, and Northbound/Southbound bus Delay Times.
+We now run a Pearson chi-square test for testing the association between bus travel direction and delay time being greater than the median.
 
 ```{r echo=FALSE}
 # Two Sided Chi-squared Test testing for association between median of E/W bus Delay Times, N/S bus Delay Times
-chisq.test(dir_table, correct = F)
+(chisq_dir <- chisq.test(dir_table, correct = F))
 ```
 
 Mood's Median Test is a two-sided test. If we want to consider the one-sided hypothesis that East/West bus Delay Times are greater than North/South bus Delay Times, then we can consider half of the p-value. We can see that the p-value for the one-sided test is much smaller than $\alpha = 0.05$, the standard significance value used for testing. 
 
 Thus the median Delay Time for East/West buses was significantly larger than the median Delay Time for North/South buses in 2020. It appears that North/South buses were more reliable overall in 2020. This does lend some credibility towards the residents' notion that North/South travel is "better" than East/West travel in Toronto.
 
+## Effect Size
+
+We can express the effect size of the Mood's median test using the Phi coefficient or the odds ratio, since Mood's median test is a form of chi-square test.
+
+```{r echo=FALSE}
+# number of samples
+nrow_busdir <- nrow(ttc_bus_delays_2020_all)
+print("n")
+nrow_busdir
+# Chi-squared Test Statistic testing for association between bus direction, whether delay time is higher than grand median
+chisq_stat_dir <- chisq_dir$statistic
+print("Chi-squared test statistic")
+chisq_stat_dir
+
+# Phi coefficient for effect size of chi-square test
+phi_chisq_dir <- sqrt(chisq_stat_dir/nrow_busdir)
+print("Phi coefficient for effect size of chi-square test")
+phi_chisq_dir
+```
+
+We see that the Phi coefficient is around 0.1176575. We interpret $\varphi = 0.1$ as having a small effect, $\varphi = 0.3$ as having a medium effect, and $\varphi = 0.5$ as having a large effect. Using this scale, bus route direction has a small effect on delay time being greater than the grand median.   
+
+We will now find the odds ratio.
+
+```{r, echo=FALSE}
+or_dir <- oddsratio(dir_table)
+or_dir
+```
+
+We see that the odds of an East/West bus having a delay time greater than the overall median is around 1.606718 times the odds of a North/South bus having a delay time greater than the overall median. 
+
+So there is a significant difference between the median delay times of North/South and East/West buses, but it is not very big.
 
 # Incidents Causing Delays
 

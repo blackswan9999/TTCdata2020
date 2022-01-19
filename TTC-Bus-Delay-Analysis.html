@@ -192,7 +192,10 @@ pre code {
 <li><a href="#experiment-with-chebyshevs-bound-for-confidence-intervals">Experiment with Chebyshev’s bound for Confidence Intervals</a></li>
 <li><a href="#effect-size">Effect Size</a></li>
 </ul></li>
-<li><a href="#delays-in-eastboundwestbound-buses-vs-northboundsouthbound-buses">Delays in Eastbound/Westbound buses vs Northbound/Southbound buses</a></li>
+<li><a href="#delays-in-eastboundwestbound-buses-vs-northboundsouthbound-buses">Delays in Eastbound/Westbound buses vs Northbound/Southbound buses</a>
+<ul>
+<li><a href="#effect-size-1">Effect Size</a></li>
+</ul></li>
 <li><a href="#incidents-causing-delays">Incidents Causing Delays</a>
 <ul>
 <li><a href="#delays-involving-ttc-vehicle-collisions-vs-non-ttc-vehicle-collisions">Delays Involving TTC vehicle Collisions vs Non-TTC vehicle Collisions</a></li>
@@ -435,7 +438,7 @@ pre code {
 ## 
 ## attr(,&quot;method&quot;)
 ## [1] &quot;median-unbiased estimate &amp; mid-p exact CI&quot;</code></pre>
-<p>We see that the odds of a regular bus having a delay time greater than the median is nearly 2.98 times that the odds of an express bus having a delay time greater than the median.</p>
+<p>We see that the odds of a regular bus having a delay time greater than the median is nearly 2.98 times the odds of an express bus having a delay time greater than the median.</p>
 </div>
 </div>
 <div id="delays-in-eastboundwestbound-buses-vs-northboundsouthbound-buses" class="section level1">
@@ -447,10 +450,10 @@ pre code {
 <p>First we’ll find the median across both Eastbound/Westbound and Northbound/Southbound groups combined. Then we will see how many Eastbound/Westbound bus delay times are greater than this median, and how many Northbound/Southbound bus delay times are greater than this median. This gives us the following table.</p>
 <pre><code>##                
 ## Route_Direction FALSE  TRUE
-##     East/West    7172  8256
-##     North/South 10262  7352</code></pre>
+##     North/South 10262  7352
+##     East/West    7172  8256</code></pre>
 <p>From the table, we can see that nearly 58% of the North/South bus delay times were below the median for the group with both types of buses. In contrast, only around 47% of the East/West bus delay times were below the median for Express and Regular buses.</p>
-<p>We now run a two-sided Pearson chi-square test for testing the association between median Eastbound/Westbound bus Delay Times, and Northbound/Southbound bus Delay Times.</p>
+<p>We now run a Pearson chi-square test for testing the association between bus travel direction and delay time being greater than the median.</p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -458,6 +461,46 @@ pre code {
 ## X-squared = 457.41, df = 1, p-value &lt; 2.2e-16</code></pre>
 <p>Mood’s Median Test is a two-sided test. If we want to consider the one-sided hypothesis that East/West bus Delay Times are greater than North/South bus Delay Times, then we can consider half of the p-value. We can see that the p-value for the one-sided test is much smaller than <span class="math inline">\(\alpha = 0.05\)</span>, the standard significance value used for testing.</p>
 <p>Thus the median Delay Time for East/West buses was significantly larger than the median Delay Time for North/South buses in 2020. It appears that North/South buses were more reliable overall in 2020. This does lend some credibility towards the residents’ notion that North/South travel is “better” than East/West travel in Toronto.</p>
+<div id="effect-size-1" class="section level2">
+<h2>Effect Size</h2>
+<p>We can express the effect size of the Mood’s median test using the Phi coefficient or the odds ratio, since Mood’s median test is a form of chi-square test.</p>
+<pre><code>## [1] &quot;n&quot;</code></pre>
+<pre><code>## [1] 33042</code></pre>
+<pre><code>## [1] &quot;Chi-squared test statistic&quot;</code></pre>
+<pre><code>## X-squared 
+##  457.4102</code></pre>
+<pre><code>## [1] &quot;Phi coefficient for effect size of chi-square test&quot;</code></pre>
+<pre><code>## X-squared 
+## 0.1176575</code></pre>
+<p>We see that the Phi coefficient is around 0.1176575. We interpret <span class="math inline">\(\varphi = 0.1\)</span> as having a small effect, <span class="math inline">\(\varphi = 0.3\)</span> as having a medium effect, and <span class="math inline">\(\varphi = 0.5\)</span> as having a large effect. Using this scale, bus route direction has a small effect on delay time being greater than the grand median.</p>
+<p>We will now find the odds ratio.</p>
+<pre><code>## $data
+##                
+## Route_Direction FALSE  TRUE Total
+##     North/South 10262  7352 17614
+##     East/West    7172  8256 15428
+##     Total       17434 15608 33042
+## 
+## $measure
+##                odds ratio with 95% C.I.
+## Route_Direction estimate    lower   upper
+##     North/South 1.000000       NA      NA
+##     East/West   1.606718 1.538279 1.67831
+## 
+## $p.value
+##                two-sided
+## Route_Direction midp.exact  fisher.exact    chi.square
+##     North/South         NA            NA            NA
+##     East/West            0 1.205166e-101 1.759889e-101
+## 
+## $correction
+## [1] FALSE
+## 
+## attr(,&quot;method&quot;)
+## [1] &quot;median-unbiased estimate &amp; mid-p exact CI&quot;</code></pre>
+<p>We see that the odds of an East/West bus having a delay time greater than the overall median is around 1.606718 times the odds of a North/South bus having a delay time greater than the overall median.</p>
+<p>So there is a significant difference between the median delay times of North/South and East/West buses, but it is not very big.</p>
+</div>
 </div>
 <div id="incidents-causing-delays" class="section level1">
 <h1>Incidents Causing Delays</h1>
