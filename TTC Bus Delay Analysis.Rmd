@@ -560,7 +560,7 @@ collision_table
 
 Note that nearly 81% of TTC collision delay times are below the median across both groups, while nearly 17% of non-TTC delay times are below that threshold.
 
-We now run a two-sided Pearson chi-square test for testing the association between median TTC Collision bus Delay Times, and Non-TTC Collision bus Delay Times.
+We now run a two-sided Pearson chi-square test for testing the association between Collision type and Delay Time being greater than overall median.
 
 ```{r echo=FALSE}
 # Two Sided Chi-squared Test testing for association between median of TTC Collision Delay Times, Non-TTC Collision Delay Times
