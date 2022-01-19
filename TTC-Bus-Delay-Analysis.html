@@ -400,9 +400,7 @@ pre code {
 <div id="effect-size" class="section level2">
 <h2>Effect Size</h2>
 <p>We have shown that there is a significant difference between the median delay times for Regular and Express buses. I would like to estimate the effect size, i.e. how much difference there is between the delay times of the Regular and Express buses. Usually Cohen’s d is used to express the effect size when the data is normal. However as we have seen from the Normal QQ plots, the bus delay data is not normal.</p>
-<p>It turns out that since Mood’s median test is a type of chi-square test, we can express the effect sizes for Mood’s median test the same way we can express the effect sizes for chi-square tests.</p>
-<p>One way to express the effect size for a chi-square test on a <span class="math inline">\(2 \times 2\)</span> table is by computing the Phi coefficient <span class="math inline">\(\varphi = \sqrt{\frac{\chi^2}{n}}\)</span> where <span class="math inline">\(\chi^2\)</span> is the test statistic and <span class="math inline">\(n\)</span> is the total number of samples in the table.</p>
-<p>Another way to express the effect size for a chi-square test on a <span class="math inline">\(2 \times 2\)</span> table is the odds ratio.</p>
+<p>It turns out that since Mood’s median test is a type of chi-square test, we can express the effect sizes for Mood’s median test the same way we can express the effect sizes for chi-square tests. One way to express the effect size for a chi-square test on a <span class="math inline">\(2 \times 2\)</span> table is by computing the Phi coefficient <span class="math inline">\(\varphi = \sqrt{\frac{\chi^2}{n}}\)</span> where <span class="math inline">\(\chi^2\)</span> is the test statistic and <span class="math inline">\(n\)</span> is the total number of samples in the table.</p>
 <pre><code>## [1] &quot;n&quot;</code></pre>
 <pre><code>## [1] 31837</code></pre>
 <pre><code>## [1] &quot;Chi-squared test statistic&quot;</code></pre>
@@ -412,6 +410,32 @@ pre code {
 <pre><code>## X-squared 
 ## 0.1341457</code></pre>
 <p>We can see that <span class="math inline">\(\varphi \approx 0.1341457\)</span>. We interpret <span class="math inline">\(\varphi = 0.1\)</span> as having a small effect, <span class="math inline">\(\varphi = 0.3\)</span> as having a medium effect, and <span class="math inline">\(\varphi = 0.5\)</span> as having a large effect. Using this scale, bus service type (Regular/Express) has a small effect on delay time being greater than the grand median.</p>
+<p>Another way to express the effect size for a chi-square test on a <span class="math inline">\(2 \times 2\)</span> table is the odds ratio.</p>
+<pre><code>## $data
+##             
+## Service_Type FALSE  TRUE Total
+##      Express  1978   621  2599
+##      Regular 15109 14129 29238
+##      Total   17087 14750 31837
+## 
+## $measure
+##             odds ratio with 95% C.I.
+## Service_Type estimate    lower    upper
+##      Express 1.000000       NA       NA
+##      Regular 2.977984 2.715161 3.270504
+## 
+## $p.value
+##             two-sided
+## Service_Type midp.exact  fisher.exact   chi.square
+##      Express         NA            NA           NA
+##      Regular          0 1.477876e-133 1.30781e-126
+## 
+## $correction
+## [1] FALSE
+## 
+## attr(,&quot;method&quot;)
+## [1] &quot;median-unbiased estimate &amp; mid-p exact CI&quot;</code></pre>
+<p>We see that the odds of a regular bus having a delay time greater than the median is nearly 2.98 times that the odds of an express bus having a delay time greater than the median.</p>
 </div>
 </div>
 <div id="delays-in-eastboundwestbound-buses-vs-northboundsouthbound-buses" class="section level1">
