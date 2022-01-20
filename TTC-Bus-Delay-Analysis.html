@@ -413,7 +413,7 @@ pre code {
 <pre><code>## [1] &quot;Phi coefficient for effect size of chi-square test&quot;</code></pre>
 <pre><code>## X-squared 
 ## 0.1341457</code></pre>
-<p>We can see that <span class="math inline">\(\varphi \approx 0.1341457\)</span>. We interpret <span class="math inline">\(\varphi = 0.1\)</span> as having a small effect, <span class="math inline">\(\varphi = 0.3\)</span> as having a medium effect, and <span class="math inline">\(\varphi = 0.5\)</span> as having a large effect. Using this scale, bus service type (Regular/Express) has a small effect on delay time being greater than the grand median.</p>
+<p>We can see that <span class="math inline">\(\varphi \approx 0.1341457\)</span>. We interpret <span class="math inline">\(\varphi = 0.1\)</span> as having a small effect, <span class="math inline">\(\varphi = 0.3\)</span> as having a medium effect, and <span class="math inline">\(\varphi = 0.5\)</span> as having a large effect, in accordance with Cohen’s 1988 book <em>Statistical Power Analysis for the Behavioral Sciences</em>. Using this scale, bus service type (Regular/Express) has a small effect on delay time being greater than the grand median.</p>
 <p>Another way to express the effect size for a chi-square test on a <span class="math inline">\(2 \times 2\)</span> table is the odds ratio.</p>
 <pre><code>## $data
 ##             
@@ -473,7 +473,7 @@ pre code {
 <pre><code>## [1] &quot;Phi coefficient for effect size of chi-square test&quot;</code></pre>
 <pre><code>## X-squared 
 ## 0.1176575</code></pre>
-<p>We see that the Phi coefficient is around 0.1176575. We interpret <span class="math inline">\(\varphi = 0.1\)</span> as having a small effect, <span class="math inline">\(\varphi = 0.3\)</span> as having a medium effect, and <span class="math inline">\(\varphi = 0.5\)</span> as having a large effect. Using this scale, bus route direction has a small effect on delay time being greater than the grand median.</p>
+<p>We see that the Phi coefficient is around 0.1176575. We interpret <span class="math inline">\(\varphi = 0.1\)</span> as having a small effect, <span class="math inline">\(\varphi = 0.3\)</span> as having a medium effect, and <span class="math inline">\(\varphi = 0.5\)</span> as having a large effect, in accordance with Cohen’s 1988 book <em>Statistical Power Analysis for the Behavioral Sciences</em>.. Using this scale, bus route direction has a small effect on delay time being greater than the grand median.</p>
 <p>We will now find the odds ratio.</p>
 <pre><code>## $data
 ##                
@@ -500,11 +500,7 @@ pre code {
 ## attr(,&quot;method&quot;)
 ## [1] &quot;median-unbiased estimate &amp; mid-p exact CI&quot;</code></pre>
 <p>We see that the odds of an East/West bus having a delay time greater than the overall median is around 1.606718 times the odds of a North/South bus having a delay time greater than the overall median.</p>
-<<<<<<< HEAD
 <p>So there is a significant difference between the median delay times of North/South and East/West buses, but it is rather small.</p>
-=======
-<p>So there is a significant difference between the median delay times of North/South and East/West buses, but it is not very big.</p>
->>>>>>> ef74a8d9e5c4dbb02e6b565b3337fae1942aa152
 </div>
 </div>
 <div id="incidents-causing-delays" class="section level1">
@@ -547,7 +543,7 @@ pre code {
 <pre><code>## [1] &quot;Phi coefficient for effect size of chi-square test&quot;</code></pre>
 <pre><code>## X-squared 
 ## 0.6374381</code></pre>
-<p>We see that the Phi coefficient is around 0.6374381. We interpret <span class="math inline">\(\varphi = 0.1\)</span> as having a small effect, <span class="math inline">\(\varphi = 0.3\)</span> as having a medium effect, and <span class="math inline">\(\varphi = 0.5\)</span> as having a large effect. Using this scale, bus route direction has a large effect on delay time being greater than the grand median.</p>
+<p>We see that the Phi coefficient is around 0.6374381. We interpret <span class="math inline">\(\varphi = 0.1\)</span> as having a small effect, <span class="math inline">\(\varphi = 0.3\)</span> as having a medium effect, and <span class="math inline">\(\varphi = 0.5\)</span> as having a large effect, in accordance with Cohen’s 1988 book <em>Statistical Power Analysis for the Behavioral Sciences</em>. Using this scale, bus route direction has a large effect on delay time being greater than the grand median.</p>
 <p>We will now find the odds ratio.</p>
 <pre><code>## $data
 ##                      
@@ -646,7 +642,9 @@ pre code {
 <p><a href="https://towardsdatascience.com/what-if-your-data-is-not-normal-d7293f7b8f0" class="uri">https://towardsdatascience.com/what-if-your-data-is-not-normal-d7293f7b8f0</a></p>
 <p><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2850938/" class="uri">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2850938/</a></p>
 <p><a href="https://www.statology.org/effect-size-chi-square/" class="uri">https://www.statology.org/effect-size-chi-square/</a></p>
-<p>Ellis, P. D. (2010). The Essential Guide to effect sizes: Statistical Power, meta-analysis, and the interpretation of research results. Cambridge University Press.</p>
+<p><a href="https://www.rdocumentation.org/packages/epitools/versions/0.5-10.1/topics/oddsratio" class="uri">https://www.rdocumentation.org/packages/epitools/versions/0.5-10.1/topics/oddsratio</a></p>
+<p>Cohen, J. (1988). <em>Statistical Power Analysis for the Behavioral Sciences, 2nd Edition.</em> Routledge.</p>
+<p>Ellis, P. D. (2010). <em>The Essential Guide to effect sizes: Statistical Power, meta-analysis, and the interpretation of research results</em>. Cambridge University Press.</p>
 </div>
 
 

@@ -427,7 +427,7 @@ print("Phi coefficient for effect size of chi-square test")
 phi_chisq_types
 ```
 
-We can see that $\varphi \approx 0.1341457$. We interpret $\varphi = 0.1$ as having a small effect, $\varphi = 0.3$ as having a medium effect, and $\varphi = 0.5$ as having a large effect. Using this scale, bus service type (Regular/Express) has a small effect on delay time being greater than the grand median.   
+We can see that $\varphi \approx 0.1341457$. We interpret $\varphi = 0.1$ as having a small effect, $\varphi = 0.3$ as having a medium effect, and $\varphi = 0.5$ as having a large effect, in accordance with Cohen's 1988 book *Statistical Power Analysis for the Behavioral Sciences*. Using this scale, bus service type (Regular/Express) has a small effect on delay time being greater than the grand median.   
 
 Another way to express the effect size for a chi-square test on a $2 \times 2$ table is the odds ratio.
 
@@ -497,7 +497,7 @@ print("Phi coefficient for effect size of chi-square test")
 phi_chisq_dir
 ```
 
-We see that the Phi coefficient is around 0.1176575. We interpret $\varphi = 0.1$ as having a small effect, $\varphi = 0.3$ as having a medium effect, and $\varphi = 0.5$ as having a large effect. Using this scale, bus route direction has a small effect on delay time being greater than the grand median.   
+We see that the Phi coefficient is around 0.1176575. We interpret $\varphi = 0.1$ as having a small effect, $\varphi = 0.3$ as having a medium effect, and $\varphi = 0.5$ as having a large effect, in accordance with Cohen's 1988 book *Statistical Power Analysis for the Behavioral Sciences*.. Using this scale, bus route direction has a small effect on delay time being greater than the grand median.   
 
 We will now find the odds ratio.
 
@@ -591,7 +591,7 @@ print("Phi coefficient for effect size of chi-square test")
 phi_chisq_col
 ```
 
-We see that the Phi coefficient is around 0.6374381. We interpret $\varphi = 0.1$ as having a small effect, $\varphi = 0.3$ as having a medium effect, and $\varphi = 0.5$ as having a large effect. Using this scale, bus route direction has a large effect on delay time being greater than the grand median.   
+We see that the Phi coefficient is around 0.6374381. We interpret $\varphi = 0.1$ as having a small effect, $\varphi = 0.3$ as having a medium effect, and $\varphi = 0.5$ as having a large effect, in accordance with Cohen's 1988 book *Statistical Power Analysis for the Behavioral Sciences*. Using this scale, bus route direction has a large effect on delay time being greater than the grand median.   
 
 We will now find the odds ratio.
 
@@ -669,4 +669,8 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2850938/
 
 https://www.statology.org/effect-size-chi-square/ 
 
-Ellis, P. D. (2010). The Essential Guide to effect sizes: Statistical Power, meta-analysis, and the interpretation of research results. Cambridge University Press. 
+https://www.rdocumentation.org/packages/epitools/versions/0.5-10.1/topics/oddsratio 
+
+Cohen, J. (1988). *Statistical Power Analysis for the Behavioral Sciences, 2nd Edition.* Routledge.
+
+Ellis, P. D. (2010). *The Essential Guide to effect sizes: Statistical Power, meta-analysis, and the interpretation of research results*. Cambridge University Press. 
